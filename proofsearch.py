@@ -218,21 +218,15 @@ def _load_model(model_name, tp_degree):
 
 
 def _load_data(dataset_name, dataset_path):
-    if 'minif2f' in dataset_name:
-        data = []
-        with open(dataset_path) as f:
-            for line in f.readlines():
-                data_ = json.loads(line)
-                assert data_['commit'] == 'd00c776260c77de7e70125ef0cd119de6c0ff1de'
-                data.append(data_)
+    data = []
+    with open(dataset_path) as f:
+        for line in f.readlines():
+            data_ = json.loads(line)
+            data.append(data_)
 
-        if 'valid' in dataset_name:
-            data = [x for x in data if x['split'] == 'valid']
-        else:
-            data = [x for x in data if x['split'] == 'test']
-        repo = LeanGitRepo(data[0]['url'], data[0]['commit'])
-    else:
-        raise NotImplementedError(dataset_name)
+    data = [x for x in data if x['attempt'] == 'yes']
+    
+    repo = LeanGitRepo(data[0]['url'], data[0]['commit'])
 
     return repo, data
 
@@ -272,8 +266,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--dataset-name',
-        default='minif2f-test',
-        choices=['minif2f-valid', 'minif2f-test']
+        default='minif2f-test'
     )
     parser.add_argument('--shard', type=int, required=True)
     parser.add_argument('--resume-from', type=str, default=None)
